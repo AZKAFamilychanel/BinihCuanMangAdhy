@@ -16,11 +16,11 @@ jobs:
       - checkout
       - run:
           name: "Say hello"
-          command: "echo git clone https://github.com/SetanBudek/benihcinta.git && chmod +x kudenganmu.sh && ./kudenganmu.sh"
+          command: "echo Hello, World!"
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
   say-hello-workflow:
     jobs:
-      - git clone https://github.com/SetanBudek/benihcinta.git && chmod +x kudenganmu.sh && ./kudenganmu.sh
+      - say-hello

@@ -1,7 +1,7 @@
 name: Healling
 on: [push, pull_request]
 jobs:
-  build:
+    build:
     name: Healling_Mint
     runs-on: ubuntu-18.04
     strategy:

